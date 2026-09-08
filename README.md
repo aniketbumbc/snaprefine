@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Coder's Banana
 
-## Getting Started
+An AI-powered image editor built with Next.js and the OpenAI image generation API. Upload a photo, paint a mask over the region you want to change, describe the edit, and let AI regenerate just that area — plus one-click background removal, style filters, and aspect-ratio expansion (outpainting).
 
-First, run the development server:
+## Features
+
+- **Masked editing** — brush/erase tools to select a region, then prompt an edit that's applied only inside the mask while the rest of the image stays untouched.
+- **AI filters** — one-click style transfers (Toonify, Ghibli Studio, Cyberpunk, Oil Painting) that preserve composition while restyling color/lighting.
+- **Background removal** — strip the background from the current image.
+- **AI expansion (outpainting)** — extend the canvas to a new aspect ratio (square, 16:9, 9:16, etc.) while keeping the original subject intact.
+- **Edit history** — undo/redo through prior edits via the right sidebar (in-memory only, cleared on refresh).
+
+## Tech stack
+
+- [Next.js 16](https://nextjs.org) (App Router) + React 19 + TypeScript
+- [Tailwind CSS 4](https://tailwindcss.com) + [Radix UI](https://www.radix-ui.com) primitives (`components/ui`)
+- [Zustand](https://github.com/pmndrs/zustand) for editor state (`store/useEditorState.ts`)
+- [OpenAI SDK](https://github.com/openai/openai-node) (`responses.create` with the `image_generation` tool) for edits/filters/expansion
+- pnpm workspace
+
+## Getting started
+
+Install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Create a `.env.local` file in the project root with:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+OPENAI_API_KEY=sk-...
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+> `GEMINI_API_KEY` / `@google/genai` are present in the project but not currently wired into any code path.
 
-## Learn More
+Run the dev server:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project structure
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/
+  page.tsx              # main editor screen
+  api/editImage/route.ts # OpenAI image edit/generation endpoint
+components/
+  image-editor.tsx       # canvas + masking UI
+  left-sidebar.tsx        # tools, brush, filters, expansion options
+  right-sidebar.tsx       # edit history
+  prompt-input.tsx        # prompt bar
+  ai-elements/            # generic chat/agent UI primitives
+  ui/                     # shadcn/radix-based UI primitives
+lib/
+  editImage.ts            # client wrapper around /api/editImage
+  constants.ts             # filters, aspect ratios, tool types
+store/
+  useEditorState.ts        # zustand store: image state, history, AI actions
+```
