@@ -1,12 +1,36 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import type { ResponseInputMessageContentList } from 'openai/resources/responses/responses';
+import { getClientIp, rateLimit } from '@/lib/rateLimit';
+
+const RATE_LIMIT = 5;
+const RATE_LIMIT_WINDOW_MS = 30 * 60 * 1000;
+
 /**
  *
  * @param request  Api call to llm with data
  * @returns
  */
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const { allowed, resetAt } = rateLimit(
+    ip,
+    RATE_LIMIT,
+    RATE_LIMIT_WINDOW_MS,
+  );
+
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': Math.ceil((resetAt - Date.now()) / 1000).toString(),
+        },
+      },
+    );
+  }
+
   const { imageUrl, prompt, usersFiles, aspectRatio, maskImageUrl } =
     await request.json();
 
