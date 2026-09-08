@@ -1,3 +1,5 @@
 ignoredBuiltDependencies:
+  - '@google/genai'
+  - protobufjs
   - sharp
   - unrs-resolver
