@@ -113,10 +113,6 @@ export const useEditorStore = create<EditorState>()(
       const maskImageUrl = get().maskImageUrl;
       set({ isLoading: true });
 
-      set(() => ({
-        history: [...get().history, imageUrl],
-      }));
-
       const finalPrompt = `Task: Professional image editing / image generation / film role painting prompt.
 
 Input Data:
@@ -182,12 +178,19 @@ Final Requirement:
         usersFiles,
         maskImageUrl,
       });
-      set({ imageUrl: data.imageUrl });
-      const clonedHistory = [...get().history];
-      clonedHistory.push(data.imageUrl);
-      set({ historyIndex: clonedHistory.length - 1 });
-      set({ history: clonedHistory });
-      set({ isLoading: false });
+      const { history: newHistory, historyIndex: newIndex } =
+        appendEditToHistory(
+          get().history,
+          get().historyIndex,
+          imageUrl,
+          data.imageUrl,
+        );
+      set({
+        history: newHistory,
+        imageUrl: data.imageUrl,
+        historyIndex: newIndex,
+        isLoading: false,
+      });
       return data;
     },
 
