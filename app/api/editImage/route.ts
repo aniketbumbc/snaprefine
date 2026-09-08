@@ -42,25 +42,43 @@ export async function POST(request: Request) {
     );
   }
   if (!process.env.OPENAI_API_KEY) {
-    return NextResponse.json({ error: 'OPENAI_API_KEY is not set' });
+    return NextResponse.json(
+      { error: 'OPENAI_API_KEY is not set' },
+      { status: 500 },
+    );
   }
 
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  const response = await openai.responses.create({
-    model: 'gpt-5.5',
-    input: [
+  let response;
+  try {
+    response = await openai.responses.create({
+      model: 'gpt-5.5',
+      input: [
+        {
+          role: 'user',
+          content: structuredContent,
+        },
+      ],
+      tools: [
+        {
+          type: 'image_generation',
+          size: aspectRatio ? aspectRatio : undefined,
+        },
+      ],
+    });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
       {
-        role: 'user',
-        content: structuredContent,
+        error:
+          error instanceof Error ? error.message : 'Failed to edit image',
       },
-    ],
-    tools: [
-      { type: 'image_generation', size: aspectRatio ? aspectRatio : undefined },
-    ],
-  });
+      { status: 500 },
+    );
+  }
 
   const imageData = response.output
     .filter((output: any) => output.type === 'image_generation_call')
@@ -73,6 +91,9 @@ export async function POST(request: Request) {
     });
   } else {
     console.log(response.output);
-    return NextResponse.json({ error: 'No image data found' });
+    return NextResponse.json(
+      { error: 'No image data found' },
+      { status: 500 },
+    );
   }
 }
