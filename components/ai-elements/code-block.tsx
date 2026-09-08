@@ -103,8 +103,8 @@ type CodeBlockProps = HTMLAttributes<HTMLDivElement> & {
 
 interface TokenizedCode {
   tokens: ThemedToken[][];
-  fg: string;
-  bg: string;
+  fg?: string;
+  bg?: string;
 }
 
 interface CodeBlockContextType {

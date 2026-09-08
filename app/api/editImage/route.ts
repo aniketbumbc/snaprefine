@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import type { ResponseInputMessageContentList } from 'openai/resources/responses/responses';
 /**
  *
  * @param request  Api call to llm with data
@@ -9,7 +10,7 @@ export async function POST(request: Request) {
   const { imageUrl, prompt, usersFiles, aspectRatio, maskImageUrl } =
     await request.json();
 
-  const structuredContent = [];
+  const structuredContent: ResponseInputMessageContentList = [];
   structuredContent.push(
     {
       type: 'input_text',
@@ -19,6 +20,7 @@ export async function POST(request: Request) {
     {
       type: 'input_image',
       image_url: imageUrl,
+      detail: 'auto',
     },
   );
 
@@ -26,6 +28,7 @@ export async function POST(request: Request) {
     structuredContent.push({
       type: 'input_image',
       image_url: maskImageUrl,
+      detail: 'auto',
     });
   }
 
@@ -34,6 +37,7 @@ export async function POST(request: Request) {
       structuredContent.push({
         type: 'input_image',
         image_url: file.url,
+        detail: 'auto',
       }),
     );
   }
@@ -68,7 +72,7 @@ export async function POST(request: Request) {
       imageUrl: `data:image/png;base64,${imageBase64}`,
     });
   } else {
-    console.log(response.output.content);
+    console.log(response.output);
     return NextResponse.json({ error: 'No image data found' });
   }
 }

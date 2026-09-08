@@ -89,7 +89,7 @@ const ImageEditor = () => {
     const ctx = offscreen.getContext("2d");
     if (!ctx) return;
 
-    if(selectedTool === ToolType.BRUSH){
+    if(selectedTool === ToolType.BRUSH || selectedTool === ToolType.ERASE){
     ctx.lineWidth = brushSize;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -204,7 +204,9 @@ const ImageEditor = () => {
      }
     }
     const imageDataUrl = overlayCanvasRef.current?.toDataURL('image/png');
-    setMaskImageUrl(imageDataUrl);
+    if (imageDataUrl) {
+      setMaskImageUrl(imageDataUrl);
+    }
   };
 
   return (

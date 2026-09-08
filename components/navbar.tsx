@@ -12,6 +12,7 @@ export function Navbar() {
   const { undoImage, redoImage, historyIndex, history, setIsHistoryOpen ,isHistoryOpen, imageUrl} = useEditorStore();
 
   const handleExport = () => {
+    if (!imageUrl) return;
     const link = document.createElement("a");
     link.href = imageUrl;
     const now = new Date();
