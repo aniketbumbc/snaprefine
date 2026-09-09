@@ -12,26 +12,41 @@ import { useRef, useState } from 'react';
 import { useEditorStore } from '@/store/useEditorState';
 import ImageEditor from '@/components/image-editor';
 import { Toaster } from '@/components/ui/toaster';
+import { ALLOWED_UPLOAD_IMAGE_TYPES, MAX_UPLOAD_IMAGE_BYTES } from '@/lib/constants';
 
 export default function Home() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
- const { imageUrl, setImageUrl, isHistoryOpen, isLoading } = useEditorStore();
+ const { imageUrl, setImageUrl, isHistoryOpen, isLoading, showToast } = useEditorStore();
   const handleSelectImage = () => {
     fileInputRef.current?.click();
   }
 
   const handlImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event?.target?.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const image = reader.result as string;
-       setImageUrl(image);
-      }
-      reader.readAsDataURL(file as File);
-  }
-};
+    if (!file) return;
+
+    if (!ALLOWED_UPLOAD_IMAGE_TYPES.includes(file.type)) {
+      showToast('Unsupported file type. Please upload a PNG, JPEG, WEBP, or GIF image.');
+      event.target.value = '';
+      return;
+    }
+
+    if (file.size > MAX_UPLOAD_IMAGE_BYTES) {
+      showToast(
+        `Image is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Max size is ${MAX_UPLOAD_IMAGE_BYTES / (1024 * 1024)}MB.`,
+      );
+      event.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = reader.result as string;
+      setImageUrl(image);
+    };
+    reader.readAsDataURL(file);
+  };
 
 
   return (

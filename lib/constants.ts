@@ -176,6 +176,15 @@ export const ratios = [
   },
 ];
 
+export const MAX_UPLOAD_IMAGE_BYTES = 8 * 1024 * 1024; // 8MB
+
+export const ALLOWED_UPLOAD_IMAGE_TYPES = [
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+  'image/gif',
+];
+
 export enum ToolType {
   PAN = 'pan',
   SELECT = 'select',
