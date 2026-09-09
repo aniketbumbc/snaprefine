@@ -48,7 +48,7 @@ const GridItem = ({
               disabled={disabled}
               className={cn(
                 "relative h-20 w-full p-0 overflow-hidden rounded-lg border transition-all",
-                "bg-zinc-950 border-zinc-800",
+                "bg-background border-border",
                 "hover:border-yellow-500 hover:opacity-100",
                 // Explicit cursor handling
                 disabled ? "cursor-not-allowed opacity-40" : "cursor-pointer opacity-80",
@@ -68,7 +68,7 @@ const GridItem = ({
             side="bottom" 
             sideOffset={8} // Pushes tooltip slightly away to avoid overlap
             className={cn(
-              "bg-zinc-950 border border-zinc-800 text-zinc-200", // Dark bg & Subtle border
+              "bg-popover border border-border text-popover-foreground", // Themed bg & subtle border
               "shadow-xl rounded-lg px-3", // Better shadow & padding
               "max-w-50 wrap-break-word z-50", // Fix long text issue
               "animate-in fade-in-0 zoom-in-95" // Smooth animation
@@ -76,8 +76,8 @@ const GridItem = ({
             // This forces the arrow to be hidden if your UI library adds one by default
             align="center"
           >
-            <p className="font-bold text-xs text-zinc-100">{label}</p>
-            {desc && <p className="text-[10px] text-zinc-400 mt-1 leading-snug">{desc}</p>}
+            <p className="font-bold text-xs text-popover-foreground">{label}</p>
+            {desc && <p className="text-[10px] text-muted-foreground mt-1 leading-snug">{desc}</p>}
           </TooltipContent>
 
         </Tooltip>
@@ -93,11 +93,11 @@ const GridItem = ({
       disabled={disabled}
       className={cn(
         "relative flex flex-col items-center justify-center gap-2 p-3 h-20 w-full rounded-lg border transition-all group",
-        "bg-zinc-950 border-zinc-800",
-        "hover:border-yellow-500/50 hover:bg-zinc-900",
+        "bg-background border-border",
+        "hover:border-yellow-500/50 hover:bg-muted",
         // Explicit cursor handling
         disabled ? "cursor-not-allowed opacity-40" : "cursor-pointer",
-        isActive ? "border-yellow-500 bg-zinc-900" : ""
+        isActive ? "border-yellow-500 bg-muted" : ""
       )}
     >
       {Icon && (
@@ -105,7 +105,7 @@ const GridItem = ({
           size={20}
           className={cn(
             "transition-colors",
-            isActive ? "text-yellow-500" : "text-zinc-500 group-hover:text-yellow-500"
+            isActive ? "text-yellow-500" : "text-muted-foreground group-hover:text-yellow-500"
           )}
         />
       )}
@@ -113,13 +113,13 @@ const GridItem = ({
         <span
           className={cn(
             "block text-[10px] font-bold transition-colors",
-            isActive ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
+            isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
           )}
         >
           {label}
         </span>
         {desc && (
-          <span className="block text-[9px] text-zinc-600 group-hover:text-zinc-500 transition-colors mt-0.5 truncate w-full">
+          <span className="block text-[9px] text-muted-foreground/70 group-hover:text-muted-foreground transition-colors mt-0.5 truncate w-full">
             {desc}
           </span>
         )}

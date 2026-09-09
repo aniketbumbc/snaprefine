@@ -16,14 +16,14 @@ export const RightSidebar = () => {
 
   const {history,setHistoryIndex,historyIndex, clearHistory} = useEditorStore();
   return (
-    <aside className="flex h-full w-40 flex-col shrink-0 border-l border-zinc-800 bg-zinc-950/50 z-20 overflow-hidden">
+    <aside className="flex h-full w-40 flex-col shrink-0 border-l border-border bg-background/50 z-20 overflow-hidden">
       <div className="flex-1 min-h-0 w-full">
         <ScrollArea className="h-full w-full">
           <div className="flex flex-col gap-4 p-4 pb-4">
 
             {/* conditional reder to this if not images in history */}
             {/* <div className="text-center py-10">
-              <span className="text-xs text-zinc-600">No history yet</span>
+              <span className="text-xs text-muted-foreground">No history yet</span>
             </div> */}
 
 {history.length > 0 &&
@@ -39,7 +39,7 @@ export const RightSidebar = () => {
           "relative w-full aspect-square rounded-xl overflow-hidden border-2 transition-all duration-200",
           isActive
             ? "border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]"
-            : "border-zinc-800 hover:border-zinc-600 opacity-60 hover:opacity-100",
+            : "border-border hover:border-muted-foreground opacity-60 hover:opacity-100",
         )}
       >
         <Image
@@ -59,7 +59,7 @@ export const RightSidebar = () => {
           "absolute top-2 right-2 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shadow-md z-10 pointer-events-none",
           isActive
             ? "bg-yellow-500 text-zinc-950"
-            : "bg-zinc-800 text-zinc-400 border border-zinc-700",
+            : "bg-muted text-muted-foreground border border-border",
         )}
       >
         {index + 1}
@@ -71,14 +71,14 @@ export const RightSidebar = () => {
       </div>
 
       {/* Footer is strictly separated so it stays at bottom */}
-      <div className="p-3 border-t border-zinc-800 shrink-0 bg-zinc-950/80 backdrop-blur-sm z-30">
+      <div className="p-3 border-t border-border shrink-0 bg-background/80 backdrop-blur-sm z-30">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full text-zinc-500 hover:text-red-400 hover:bg-zinc-900 rounded-lg"
+                className="w-full text-muted-foreground hover:text-destructive hover:bg-muted rounded-lg"
                 onClick={clearHistory}
                 disabled={history.length === 0}
               >

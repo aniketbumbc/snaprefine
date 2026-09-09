@@ -29,15 +29,15 @@ import { useEditorStore } from "@/store/useEditorState";
 export const LeftSidebar = () => {
   const { applyFilter,isLoading,applyExpansion,applyRemoveBackground,setSelectedTool,selectedTool,setBrushSize,brushSize } = useEditorStore();
   return (
-    <aside className="hidden md:flex w-80 flex-col border-r border-zinc-800 bg-zinc-950/50 z-20 shrink-0 h-full">
+    <aside className="hidden md:flex w-80 flex-col border-r border-border bg-background/50 z-20 shrink-0 h-full">
       <ScrollArea className="h-full w-full">
         <div className="p-4 space-y-6">
           {/* 1. Tools Grid */}
-          <div className="px-4 space-y-2 bg-zinc-800/50 p-3 rounded-xl">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+          <div className="px-4 space-y-2 bg-muted/50 p-3 rounded-xl">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Tools
             </h3>
-            <Separator className="bg-zinc-800" />
+            <Separator className="bg-border" />
 
             <div className="grid grid-cols-4 gap-2">
               <ToolButton
@@ -69,10 +69,10 @@ export const LeftSidebar = () => {
             {/* 2. Brush Size */}
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Size
                 </h3>
-                <span className="text-xs font-mono text-zinc-200 bg-zinc-900 border border-zinc-800 px-2 py-1 rounded">
+                <span className="text-xs font-mono text-foreground bg-muted border border-border px-2 py-1 rounded">
                   10px
                 </span>
               </div>
@@ -86,20 +86,20 @@ export const LeftSidebar = () => {
                 onValueChange={(value:number[])=>{
                   setBrushSize(value[0]);
                 }}
-                className="py-2 [&>.relative>.absolute]:bg-yellow-500 **:[[role=slider]]:border-yellow-500 **:[[role=slider]]:bg-zinc-950 **:[[role=slider]]:ring-offset-zinc-950 **:[[role=slider]]:focus-visible:ring-yellow-500"
+                className="py-2 [&>.relative>.absolute]:bg-yellow-500 **:[[role=slider]]:border-yellow-500 **:[[role=slider]]:bg-background **:[[role=slider]]:ring-offset-background **:[[role=slider]]:focus-visible:ring-yellow-500"
               />
             </div>
           </div>
 
-          <Separator className="bg-zinc-800" />
+          <Separator className="bg-border" />
 
           {/* 3. AI Accordions */}
-          <div className="px-4 space-y-2 bg-zinc-800/50 p-3 rounded-xl">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+          <div className="px-4 space-y-2 bg-muted/50 p-3 rounded-xl">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Options
             </h3>
 
-            <Separator className="bg-zinc-800" />
+            <Separator className="bg-border" />
 
             <Accordion
               type="single"
@@ -108,8 +108,8 @@ export const LeftSidebar = () => {
               defaultValue="options"
             >
               {/* Item 1: Editing Options */}
-              <AccordionItem value="options" className="border-zinc-800">
-                <AccordionTrigger className="text-zinc-200 hover:text-yellow-500 hover:no-underline py-3 transition-colors">
+              <AccordionItem value="options" className="border-border">
+                <AccordionTrigger className="text-foreground hover:text-yellow-500 hover:no-underline py-3 transition-colors">
                   <div className="flex items-center gap-2">
                     <Sparkles size={16} />
                     <span className="text-sm">AI Editing Options</span>
@@ -138,8 +138,8 @@ export const LeftSidebar = () => {
               </AccordionItem>
 
               {/* Item 2: AI Filters */}
-              <AccordionItem value="filters" className="border-zinc-800">
-                <AccordionTrigger className="text-zinc-200 hover:text-yellow-500 hover:no-underline py-3 transition-colors">
+              <AccordionItem value="filters" className="border-border">
+                <AccordionTrigger className="text-foreground hover:text-yellow-500 hover:no-underline py-3 transition-colors">
                   <div className="flex items-center gap-2">
                     <ImageIcon size={16} />
                     <span className="text-sm">AI Filters</span>
@@ -168,7 +168,7 @@ export const LeftSidebar = () => {
 
               {/* Item 3: AI Expansion */}
               <AccordionItem value="expansion" className="border-none">
-                <AccordionTrigger className="text-zinc-200 hover:text-yellow-500 hover:no-underline py-3 transition-colors">
+                <AccordionTrigger className="text-foreground hover:text-yellow-500 hover:no-underline py-3 transition-colors">
                   <div className="flex items-center gap-2">
                     <Maximize size={16} />
                     <span className="text-sm">AI Expansion</span>

@@ -47,14 +47,14 @@ export default function Home() {
           <LeftSidebar />
 
           {/* MIDDLE COLUMN */}
-          <main className="flex-1 flex flex-col min-w-0 bg-zinc-900/50 relative">
+          <main className="flex-1 flex flex-col min-w-0 bg-muted/50 relative">
             {/* CANVAS AREA */}
             <div className="flex-1 relative overflow-hidden w-full h-full">
               {/* BACKGROUND PATTERN */}
               <div
-                className="absolute inset-0 opacity-[0.05]"
+                className="absolute inset-0 opacity-[0.05] text-foreground"
                 style={{
-                  backgroundImage: "radial-gradient(#fff 1px, transparent 1px)",
+                  backgroundImage: "radial-gradient(currentColor 1px, transparent 1px)",
                   backgroundSize: "20px 20px",
                 }}
               ></div>
@@ -63,7 +63,7 @@ export default function Home() {
               <div className="w-full h-full flex items-center justify-center p-6 md:p-10">
                 {!imageUrl ? (
                   <div className="text-center space-y-6 max-w-sm z-10 ">
-                    <div className="w-24 h-24 bg-zinc-900/50 rounded-3xl border border-zinc-800 flex items-center justify-center mx-auto shadow-2xl shadow-yellow-900/10">
+                    <div className="w-24 h-24 bg-muted/50 rounded-3xl border border-border flex items-center justify-center mx-auto shadow-2xl shadow-yellow-900/10">
                       <Image
                         src={"/logo.png"}
                         width={500}
@@ -73,10 +73,10 @@ export default function Home() {
                       />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold text-zinc-100">
+                      <h3 className="text-2xl font-bold text-foreground">
                         Start Creating
                       </h3>
-                      <p className="text-zinc-500 text-sm mt-3 leading-relaxed">
+                      <p className="text-muted-foreground text-sm mt-3 leading-relaxed">
                         Upload an image to unlock the full potential of{" "}
                         <span className="text-yellow-500 font-medium">
                           Coder&apos;s Banana
@@ -104,7 +104,7 @@ export default function Home() {
             </div>
 
             {/* PROMPT INPUT AREA */}
-            <div className="shrink-0 bg-zinc-950 border-t border-zinc-800 p-4 lg:p-6 z-40">
+            <div className="shrink-0 bg-background border-t border-border p-4 lg:p-6 z-40">
               <AIPromptInput />
             </div>
           </main>
