@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import type { ResponseInputMessageContentList } from 'openai/resources/responses/responses';
 import { getClientIp, rateLimit } from '@/lib/rateLimit';
 
-const RATE_LIMIT = 5;
+const RATE_LIMIT = 1;
 const RATE_LIMIT_WINDOW_MS = 30 * 60 * 1000;
 
 /**
@@ -13,11 +13,7 @@ const RATE_LIMIT_WINDOW_MS = 30 * 60 * 1000;
  */
 export async function POST(request: Request) {
   const ip = getClientIp(request);
-  const { allowed, resetAt } = rateLimit(
-    ip,
-    RATE_LIMIT,
-    RATE_LIMIT_WINDOW_MS,
-  );
+  const { allowed, resetAt } = rateLimit(ip, RATE_LIMIT, RATE_LIMIT_WINDOW_MS);
 
   if (!allowed) {
     return NextResponse.json(
@@ -97,8 +93,7 @@ export async function POST(request: Request) {
     console.error(error);
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : 'Failed to edit image',
+        error: error instanceof Error ? error.message : 'Failed to edit image',
       },
       { status: 500 },
     );
@@ -115,9 +110,6 @@ export async function POST(request: Request) {
     });
   } else {
     console.log(response.output);
-    return NextResponse.json(
-      { error: 'No image data found' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'No image data found' }, { status: 500 });
   }
 }

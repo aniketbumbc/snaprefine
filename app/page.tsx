@@ -11,6 +11,7 @@ import { RightSidebar } from "@/components/right-sidebar";
 import { useRef, useState } from 'react';
 import { useEditorStore } from '@/store/useEditorState';
 import ImageEditor from '@/components/image-editor';
+import { Toaster } from '@/components/ui/toaster';
 
 export default function Home() {
 
@@ -35,6 +36,7 @@ export default function Home() {
 
   return (
     <>
+      <Toaster />
       <div className="w-full h-dvh flex flex-col overflow-hidden">
 
         <input type="file" className='hidden' accept='image/*' ref={fileInputRef} onChange={handlImageUpload}/>

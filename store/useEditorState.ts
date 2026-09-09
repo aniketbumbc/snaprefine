@@ -1,10 +1,18 @@
 import { create } from 'zustand';
 import { FileUIPart } from 'ai';
 import { devtools } from 'zustand/middleware';
-import { editImage } from '@/lib/editImage';
+import { editImage, ApiError } from '@/lib/editImage';
 import { ToolType } from '@/lib/constants';
 
+type ToastState = {
+  message: string;
+  variant: 'default' | 'destructive';
+} | null;
+
 type EditorState = {
+  toast: ToastState;
+  showToast: (message: string, variant?: 'default' | 'destructive') => void;
+  clearToast: () => void;
   imageUrl: string | null;
   setImageUrl: (imageUrl: string) => void;
   prompt: string;
@@ -34,6 +42,18 @@ type EditorState = {
   setMaskImageUrl: (maskImageUrl: string) => void;
 };
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof ApiError) {
+    if (error.status === 429) {
+      if (!error.retryAfter) return error.message;
+      const minutes = Math.ceil(error.retryAfter / 60);
+      return `${error.message} Try again in ${minutes} min${minutes === 1 ? '' : 's'}.`;
+    }
+    return error.message;
+  }
+  return 'Something went wrong. Please try again.';
+}
+
 function appendEditToHistory(
   currentHistory: string[],
   historyIndex: number,
@@ -58,6 +78,10 @@ export const useEditorStore = create<EditorState>()(
     historyIndex: 0,
     isLoading: false,
     usersFiles: [],
+    toast: null,
+    showToast: (message: string, variant: 'default' | 'destructive' = 'destructive') =>
+      set({ toast: { message, variant } }),
+    clearToast: () => set({ toast: null }),
     setUsersFiles: (usersFiles: FileUIPart[]) => set({ usersFiles }),
     setIsLoading: (isLoading: boolean) => set({ isLoading }),
     setImageUrl: (imageUrl: string) => set({ imageUrl }),
@@ -172,26 +196,31 @@ Final Requirement:
 * All generated, modified, replaced, or reconstructed content must remain strictly confined to the white mask area while perfectly matching the original image's environment, lighting, perspective, texture, and overall visual quality.
 `;
 
-      const data = await editImage({
-        imageUrl,
-        prompt: finalPrompt,
-        usersFiles,
-        maskImageUrl,
-      });
-      const { history: newHistory, historyIndex: newIndex } =
-        appendEditToHistory(
-          get().history,
-          get().historyIndex,
+      try {
+        const data = await editImage({
           imageUrl,
-          data.imageUrl,
-        );
-      set({
-        history: newHistory,
-        imageUrl: data.imageUrl,
-        historyIndex: newIndex,
-        isLoading: false,
-      });
-      return data;
+          prompt: finalPrompt,
+          usersFiles,
+          maskImageUrl,
+        });
+        const { history: newHistory, historyIndex: newIndex } =
+          appendEditToHistory(
+            get().history,
+            get().historyIndex,
+            imageUrl,
+            data.imageUrl,
+          );
+        set({
+          history: newHistory,
+          imageUrl: data.imageUrl,
+          historyIndex: newIndex,
+        });
+        return data;
+      } catch (error) {
+        get().showToast(getErrorMessage(error));
+      } finally {
+        set({ isLoading: false });
+      }
     },
 
     applyFilter: async (filterPrompt: string) => {
@@ -202,20 +231,25 @@ Final Requirement:
        1. Strictly preserve composition do not change the subject pose the camera angle or placement objects.
        2. Output Format: this is a style transfer keep underlying structure of the image identical to the original only changing the picture structure lightning and the colors to match the request style.
       `;
-      const data = await editImage({ imageUrl, prompt: finalPromt });
-      const { history: newHistory, historyIndex: newIndex } =
-        appendEditToHistory(
-          get().history,
-          get().historyIndex,
-          imageUrl,
-          data.imageUrl,
-        );
-      set({
-        history: newHistory,
-        imageUrl: data.imageUrl,
-        historyIndex: newIndex,
-        isLoading: false,
-      });
+      try {
+        const data = await editImage({ imageUrl, prompt: finalPromt });
+        const { history: newHistory, historyIndex: newIndex } =
+          appendEditToHistory(
+            get().history,
+            get().historyIndex,
+            imageUrl,
+            data.imageUrl,
+          );
+        set({
+          history: newHistory,
+          imageUrl: data.imageUrl,
+          historyIndex: newIndex,
+        });
+      } catch (error) {
+        get().showToast(getErrorMessage(error));
+      } finally {
+        set({ isLoading: false });
+      }
     },
     applyExpansion: async (aspectRatio: string) => {
       set({ isLoading: true });
@@ -241,24 +275,29 @@ Final Requirement:
       ${technicalConstraint}
       ${userContext}
       `;
-      const data = await editImage({
-        imageUrl,
-        prompt: finalPrompt,
-        aspectRatio: aspectRatio,
-      });
-      const { history: newHistory, historyIndex: newIndex } =
-        appendEditToHistory(
-          get().history,
-          get().historyIndex,
+      try {
+        const data = await editImage({
           imageUrl,
-          data.imageUrl,
-        );
-      set({
-        history: newHistory,
-        imageUrl: data.imageUrl,
-        historyIndex: newIndex,
-        isLoading: false,
-      });
+          prompt: finalPrompt,
+          aspectRatio: aspectRatio,
+        });
+        const { history: newHistory, historyIndex: newIndex } =
+          appendEditToHistory(
+            get().history,
+            get().historyIndex,
+            imageUrl,
+            data.imageUrl,
+          );
+        set({
+          history: newHistory,
+          imageUrl: data.imageUrl,
+          historyIndex: newIndex,
+        });
+      } catch (error) {
+        get().showToast(getErrorMessage(error));
+      } finally {
+        set({ isLoading: false });
+      }
     },
 
     applyRemoveBackground: async () => {
@@ -267,20 +306,25 @@ Final Requirement:
         return;
       }
       set({ isLoading: true });
-      const data = await editImage({ imageUrl, prompt: 'remove background' });
-      const { history: newHistory, historyIndex: newIndex } =
-        appendEditToHistory(
-          get().history,
-          get().historyIndex,
-          imageUrl,
-          data.imageUrl,
-        );
-      set({
-        history: newHistory,
-        imageUrl: data.imageUrl,
-        historyIndex: newIndex,
-        isLoading: false,
-      });
+      try {
+        const data = await editImage({ imageUrl, prompt: 'remove background' });
+        const { history: newHistory, historyIndex: newIndex } =
+          appendEditToHistory(
+            get().history,
+            get().historyIndex,
+            imageUrl,
+            data.imageUrl,
+          );
+        set({
+          history: newHistory,
+          imageUrl: data.imageUrl,
+          historyIndex: newIndex,
+        });
+      } catch (error) {
+        get().showToast(getErrorMessage(error));
+      } finally {
+        set({ isLoading: false });
+      }
     },
     selectedTool: ToolType.PAN,
     setSelectedTool: (selectedTool: ToolType) => set({ selectedTool }),

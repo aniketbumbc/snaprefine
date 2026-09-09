@@ -12,6 +12,18 @@ type EditImageResponse = {
   imageUrl: string;
 };
 
+export class ApiError extends Error {
+  status: number;
+  retryAfter?: number;
+
+  constructor(message: string, status: number, retryAfter?: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.retryAfter = retryAfter;
+  }
+}
+
 export async function editImage(
   params: EditImageParams,
 ): Promise<EditImageResponse> {
@@ -20,7 +32,13 @@ export async function editImage(
     body: JSON.stringify(params),
   });
   if (!response.ok) {
-    throw new Error('Failed to edit image');
+    const body = await response.json().catch(() => null);
+    const retryAfterHeader = response.headers.get('Retry-After');
+    throw new ApiError(
+      body?.error || 'Failed to edit image',
+      response.status,
+      retryAfterHeader ? parseInt(retryAfterHeader, 10) : undefined,
+    );
   }
   return response.json();
 }
