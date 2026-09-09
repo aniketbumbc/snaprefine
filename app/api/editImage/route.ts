@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import type { ResponseInputMessageContentList } from 'openai/resources/responses/responses';
 import { getClientIp, rateLimit } from '@/lib/rateLimit';
+import { validateEditImageRequest } from '@/lib/validateEditImageRequest';
 
 const RATE_LIMIT = 1;
 const RATE_LIMIT_WINDOW_MS = 30 * 60 * 1000;
+const MAX_REQUEST_BYTES = 20 * 1024 * 1024; // 20MB
 
 /**
  *
@@ -27,8 +29,24 @@ export async function POST(request: Request) {
     );
   }
 
-  const { imageUrl, prompt, usersFiles, aspectRatio, maskImageUrl } =
-    await request.json();
+  const contentLength = Number(request.headers.get('content-length') ?? 0);
+  if (contentLength > MAX_REQUEST_BYTES) {
+    return NextResponse.json({ error: 'Request body too large.' }, { status: 413 });
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });
+  }
+
+  const validation = validateEditImageRequest(body);
+  if (!validation.valid) {
+    return NextResponse.json({ error: validation.error }, { status: 400 });
+  }
+
+  const { imageUrl, prompt, usersFiles, aspectRatio, maskImageUrl } = validation.data;
 
   const structuredContent: ResponseInputMessageContentList = [];
   structuredContent.push(
@@ -52,15 +70,13 @@ export async function POST(request: Request) {
     });
   }
 
-  if (Array.isArray(usersFiles) && usersFiles?.length > 0) {
-    usersFiles.forEach((file) =>
-      structuredContent.push({
-        type: 'input_image',
-        image_url: file.url,
-        detail: 'auto',
-      }),
-    );
-  }
+  usersFiles.forEach((file) =>
+    structuredContent.push({
+      type: 'input_image',
+      image_url: file.url,
+      detail: 'auto',
+    }),
+  );
   if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json(
       { error: 'OPENAI_API_KEY is not set' },
